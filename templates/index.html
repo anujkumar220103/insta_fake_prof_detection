@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Instagram Fake Account Detector</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      background: #08080f;
+      color: #f0f0f5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 3rem 1rem 5rem;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Ambient glow blobs */
+    body::before {
+      content: '';
+      position: fixed;
+      width: 600px; height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(225,48,108,0.12) 0%, transparent 70%);
+      top: -150px; left: -150px;
+      pointer-events: none;
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      width: 500px; height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(131,58,180,0.1) 0%, transparent 70%);
+      bottom: -100px; right: -100px;
+      pointer-events: none;
+    }
+
+    /* ── Header ── */
+    .header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      animation: fadeDown 0.6s ease both;
+    }
+
+    .ig-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+      padding: 10px 20px;
+      border-radius: 999px;
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 1.25rem;
+    }
+    .ig-badge svg { width: 18px; height: 18px; fill: white; }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(26px, 5vw, 40px);
+      font-weight: 800;
+      line-height: 1.15;
+      background: linear-gradient(135deg, #ffffff 30%, #cc2366 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.75rem;
+    }
+
+    .subtitle {
+      font-size: 15px;
+      color: #6b6b80;
+      max-width: 420px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* ── Card ── */
+    .card {
+      width: 100%;
+      max-width: 680px;
+      background: #10101a;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 20px;
+      padding: 2rem 2rem 2.5rem;
+      animation: fadeUp 0.7s ease 0.1s both;
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+      border-radius: 20px 20px 0 0;
+    }
+
+    /* ── Section labels ── */
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #cc2366;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(255,255,255,0.06);
+    }
+
+    /* ── Grid ── */
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px;
+      margin-bottom: 1.75rem;
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .field label {
+      font-size: 11px;
+      font-weight: 500;
+      color: #5a5a70;
+      letter-spacing: 0.03em;
+    }
+    .field input {
+      padding: 10px 12px;
+      background: #18182a;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 10px;
+      color: #f0f0f5;
+      font-size: 13px;
+      font-family: 'DM Sans', sans-serif;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+      -webkit-appearance: none;
+      width: 100%;
+    }
+    .field input::placeholder { color: #2e2e42; }
+    .field input:focus {
+      border-color: #cc2366;
+      background: #1c1c2e;
+      box-shadow: 0 0 0 3px rgba(204,35,102,0.15);
+    }
+    .field input:hover:not(:focus) { border-color: rgba(255,255,255,0.13); }
+
+    /* ── Divider ── */
+    .sep { border: none; border-top: 1px solid rgba(255,255,255,0.05); margin: 0.25rem 0 1.5rem; }
+
+    /* ── Submit ── */
+    .btn-wrap {
+      display: flex;
+      justify-content: center;
+      margin-top: 1.75rem;
+    }
+    button[type="submit"] {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 13px 40px;
+      background: linear-gradient(135deg, #e6683c, #dc2743, #cc2366);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-family: 'Syne', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.04em;
+      box-shadow: 0 8px 32px rgba(204,35,102,0.35);
+      transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+    }
+    button[type="submit"]:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(204,35,102,0.5);
+    }
+    button[type="submit"]:active { transform: scale(0.98); }
+    button[type="submit"] svg {
+      width: 17px; height: 17px;
+      fill: none; stroke: white;
+      stroke-width: 2.2;
+    }
+
+    /* ── Result ── */
+    .result-box {
+      margin-top: 1.5rem;
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      font-family: 'Syne', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      text-align: center;
+      animation: fadeUp 0.4s ease both;
+    }
+    .result-box:empty { display: none; }
+
+    /* Fake = red tint, Real = green tint — Jinja sets the text */
+    .result-box {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #facc15;
+    }
+
+    /* ── Animations ── */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Footer ── */
+    .footer {
+      margin-top: 2rem;
+      font-size: 12px;
+      color: #2e2e42;
+      animation: fadeUp 0.8s ease 0.3s both;
+    }
+  </style>
+</head>
+<body>
+<!-- Header -->
+  <div class="header">
+    <div class="ig-badge">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+      </svg>
+      Instagram · AI Detector
+    </div>
+    <h1>Fake Account Detector</h1>
+    <p class="subtitle">Enter profile metrics below — our ML model will analyze and classify the account instantly.</p>
+  </div>
+
+  <!-- Form card -->
+  <div class="card">
+    <form action="/predict" method="post">
+
+      <p class="section-title">Account stats</p>
+      <div class="field-grid">
+        <div class="field"><label>Number of posts</label><input type="number" name="pos" placeholder="e.g. 42" required></div>
+        <div class="field"><label>Followers</label><input type="number" name="flw" placeholder="e.g. 1200" required></div>
+        <div class="field"><label>Following</label><input type="number" name="flg" placeholder="e.g. 300" required></div>
+        <div class="field"><label>Bio length</label><input type="number" name="bl" placeholder="e.g. 80" required></div>
+        <div class="field"><label>Profile pic (0/1)</label><input type="number" name="pic" placeholder="0 or 1" required></div>
+        <div class="field"><label>External link (0/1)</label><input type="number" name="lin" placeholder="0 or 1" required></div>
+      </div>
+
+      <hr class="sep">
+      <p class="section-title">Content metrics</p>
+      <div class="field-grid">
+        <div class="field"><label>Avg caption length</label><input type="number"  name="cl" placeholder="Chars per post" required></div>
+        <div class="field"><label>Caption zero percentage</label><input type="number" step="0.01" name="cz" placeholder="0.00 - 1.00" required></div>
+        <div class="field"><label>Non-image percentage</label><input type="number" step="0.01" name="ni" placeholder="0.00 - 1.00" required></div>
+        <div class="field"><label>Content similarity</label><input type="number" step="0.01" name="cs" placeholder="0.00 – 1.00" required></div>
+        <div class="field"><label>Post interval (hours)</label><input type="number" name="pi" placeholder="e.g. 24" required></div>
+      </div>
+
+      <hr class="sep">
+      <p class="section-title">Engagement ratios</p>
+      <div class="field-grid">
+        <div class="field"><label>Likes per post / followers</label><input type="number" step="0.01" name="erl" placeholder="e.g. 0.05" required></div>
+        <div class="field"><label>Comments per post / followers</label><input type="number" step="0.01" name="erc" placeholder="e.g. 0.01" required></div>
+        <div class="field"><label>Location tag percentage</label><input type="number" step="0.01" name="lt" placeholder="0.00 - 1.00" required></div>
+        <div class="field"><label>Average hashtag count</label><input type="number" name="hc" placeholder="e.g. 5" required></div>
+        <div class="field"><label>Promotional keywords usage</label><input type="number" step="0.01" name="pr" placeholder="0.00 - 1.00" required></div>
+      </div>
+      <div class="btn-wrap">
+        <button type="submit">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          Check Account
+        </button>
+      </div>
+    </form>
+
+    <!-- Result — same Jinja variable, untouched logic -->
+    {% if prediction_text %}
+    <div class="result-box">{{ prediction_text }}</div>
+    {% endif %}
+  </div>
+
+
+</body>
+</html>
