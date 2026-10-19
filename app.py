@@ -317,7 +317,13 @@ div.stButton > button:hover {
 
 load_dotenv()
 
+# Read token from .env (local) or Streamlit secrets (cloud deploy)
 API_TOKEN = os.getenv("APIFY_API_TOKEN")
+if not API_TOKEN:
+    try:
+        API_TOKEN = st.secrets["APIFY_API_TOKEN"]
+    except Exception:
+        API_TOKEN = None
 
 
 # =========================================================
