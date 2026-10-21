@@ -108,9 +108,11 @@ client = ApifyClient(
 )
 
 run_input = {
-    "usernames": [
-        username
-    ]
+    "directUrls": [
+        f"https://www.instagram.com/{username}/"
+    ],
+    "resultsType": "details",
+    "resultsLimit": 1
 }
 
 
@@ -125,7 +127,7 @@ print(
 try:
 
     run = client.actor(
-        "apify/instagram-profile-scraper"
+        "apify/instagram-scraper"
     ).call(
         run_input=run_input
     )

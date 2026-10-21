@@ -348,11 +348,13 @@ def scrape_profile(username):
     client = ApifyClient(API_TOKEN)
 
     run_input = {
-        "usernames": [username]
+        "directUrls": [f"https://www.instagram.com/{username}/"],
+        "resultsType": "details",
+        "resultsLimit": 1
     }
 
     run = client.actor(
-        "apify/instagram-profile-scraper"
+        "apify/instagram-scraper"
     ).call(
         run_input=run_input
     )
